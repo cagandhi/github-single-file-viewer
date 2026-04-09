@@ -38,19 +38,15 @@ It provides a clean, lightweight toggle for switching between **single-file** an
 
 ### Toggle Location in PR Toolbar
 ![Toggle Location](assets/docs/toggle-placement-bar.png)
-> Example placement of the single-file toggle in the PR tab bar.
 
 ### Example: Single File Mode ON
-![Single File Mode](path/to/single-file-view.png)
-> Shows only one file visible while reviewing a PR.
+<video src="assets/docs/single-file-view-on.mp4" width="640" height="480" controls></video>
 
 ### Example: Single File Mode OFF
-![Full File Mode](path/to/full-file-view.png)
-> Shows all files when single-file mode is off.
+<video src="assets/docs/single-file-view-off.mp4" width="640" height="480" controls></video>
 
-### Optional: Animated Toggle
-`![Toggle Animation](path/to/toggle-animation.gif)`
-> You can include a small GIF showing the toggle switching between single-file and full view.  
+### Animated Toggle
+<video src="assets/docs/single-file-extension-toggle.mp4" width="640" height="480" controls></video>
 
 ---
 
