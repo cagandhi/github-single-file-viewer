@@ -1,11 +1,16 @@
 # GitHub Single File Viewer
-
+<p align="center">
+  <img src="https://img.shields.io/badge/Chrome-Supported-brightgreen?logo=googlechrome" />
+  <img src="https://img.shields.io/badge/Edge-Supported-brightgreen?logo=microsoftedge" />
+  <img src="https://img.shields.io/badge/Firefox-Not%20Supported-lightgrey?logo=firefoxbrowser" />
+</p>
 <p align="center">
   <img src="assets/icons/github-split-view-icon.png" alt="GitHub Single File Viewer Icon" width="350" height="350" />
 </p>
 
 - [Description](#description)
 - [Features](#features)
+- [Supported Browsers](#supported-browsers)
 - [Quick Start](#quick-start)
   * [1. Load the Extension](#1-load-the-extension)
   * [2. Open a PR](#2-open-a-pr)
@@ -36,6 +41,12 @@ It provides a clean, lightweight toggle for switching between **single-file** an
 - **Robust SPA handling:** Survives GitHub’s multi-pass re-rendering.
 - **Lightweight:** Minimal impact on page performance.
 
+---
+## Supported Browsers
+
+- 🟢 Chrome — Supported  
+- 🟢 Edge — Supported  
+- 🔴 Firefox — Not supported  
 ---
 
 ## Quick Start
