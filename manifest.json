@@ -2,10 +2,23 @@
   "manifest_version": 3,
   "name": "GitHub Single File Viewer",
   "version": "1.0",
-  "permissions": ["scripting", "webNavigation"],
-  "host_permissions": ["https://github.com/*"],
+  "permissions": [
+    "scripting",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "https://github.com/*"
+  ],
   "background": {
-    "service_worker": "src/background.js"
+    "service_worker": "src/background.js",
+    "scripts": [
+      "src/background.js"
+    ]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "github-single-file-viewer@cagandhi.com"
+    }
   },
   "icons": {
     "128": "assets/icons/github-split-view-icon.png"
