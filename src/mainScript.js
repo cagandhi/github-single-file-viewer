@@ -46,6 +46,14 @@ function mainScript() {
       if (idx !== -1) { showFile(idx); } else { showFile(current); }
     }
 
+    function isDarkMode() {
+      const mode = document.documentElement.getAttribute('data-color-mode');
+
+      return mode === 'dark' ||
+        (mode === 'auto' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+
     function pollToggle() {
       setInterval(() => {
         const container = document.querySelector('div[role="tablist"]');
@@ -71,7 +79,7 @@ function mainScript() {
       const container = document.querySelector('div[role="tablist"]');
       if (!container) return setTimeout(addToggle, 500);
 
-      const isDark = document.documentElement.getAttribute('data-color-mode') === 'dark';
+      const isDark = isDarkMode();
 
       const wrapper = document.createElement('div');
       wrapper.id = 'gh-single-file-toggle';
@@ -174,6 +182,16 @@ function mainScript() {
       // Start monitoring SPA URL changes
       checkUrlChange();
       waitForFilesAndInit();
+
+      // ✅ Listen for system theme changes to update toggle appearance
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      mq.addEventListener('change', () => {
+        const existingToggle = document.getElementById('gh-single-file-toggle');
+        if (existingToggle) existingToggle.remove();
+
+        addToggle();   // rebuild UI with correct theme
+        syncView();    // ensure consistency
+      });
     }
 
     pollToggle(); // start polling immediately
