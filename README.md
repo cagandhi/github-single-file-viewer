@@ -1,8 +1,8 @@
 # GitHub Single File Viewer
 <p align="center">
   <img src="https://img.shields.io/badge/Chrome-Supported-brightgreen?logo=googlechrome" />
-  <img src="https://img.shields.io/badge/Edge-Supported-brightgreen?logo=microsoftedge" />
-  <img src="https://img.shields.io/badge/Firefox-Not%20Supported-lightgrey?logo=firefoxbrowser" />
+  <img src="https://img.shields.io/badge/Edge-Supported-brightgreen?logo=microsoft-edge" />
+  <img src="https://img.shields.io/badge/Firefox-Supported-brightgreen?logo=firefoxbrowser" />
 </p>
 <p align="center">
   <img src="assets/icons/github-split-view-icon.png" alt="GitHub Single File Viewer Icon" width="350" height="350" />
@@ -23,6 +23,7 @@
   * [Single File Mode OFF](#single-file-mode-off)
   * [Animated Toggle](#animated-toggle)
 - [Usage Notes](#usage-notes)
+- [Known Limitations](#known-limitations)
 - [Development](#development)
 - [Contributing](#contributing)
 
@@ -44,23 +45,29 @@ It provides a clean, lightweight toggle for switching between **single-file** an
 ---
 ## Supported Browsers
 
-- 🟢 Chrome — Supported  
-- 🟢 Edge — Supported  
-- 🔴 Firefox — Not supported  
----
+🟢 Chrome 🟢 Edge 🟢 Firefox
 
 ## Quick Start
 
-### 1. Load the Extension
-- Open Chrome/Edge: `chrome://extensions/` or `edge://extensions/`.
-- Enable **Developer mode**.
+### 1. Download extension folder
+- Download the GitHub repo as a ZIP file or clone the repo using git.
+
+### 2. Load the Extension
+#### For Chrome/Edge or any Chromium browser
+- Open `chrome://extensions/` or `edge://extensions/` or however extensions are loaded in your browser.
+- Enable **Developer mode**, if needed.
 - Click **Load unpacked** and select this extension folder.
 
-### 2. Open a PR
-- Navigate to the **Files changed** tab of any PR
+#### For Firefox
+- Open `about:debugging#/runtime/this-firefox`.
+- Click on **Load Temporary Add-on**.
+- Select `manifest.json` file from the extension folder.
+
+### 3. Open a PR
+- Navigate to the **Files changed** tab of any PR.
 - The single-file toggle will automatically appear in the PR toolbar.
 
-### 3. Toggle View
+### 4. Toggle View
 - **Click the toggle** to switch ON/OFF between single-file and full-file view.
 - Preference is stored automatically in **localStorage**.
 
@@ -92,6 +99,14 @@ It provides a clean, lightweight toggle for switching between **single-file** an
 - The toggle appears automatically for PR pages under `/pull/`.
 - Works for both **full page loads** and **SPA navigation** between PRs.
 - Does **not modify GitHub files** — only controls browser visibility.
+
+---
+
+## Known limitations
+- It does not work correctly when logged out of Github account. There is no plan to support unauthenticated mode for now.
+- When Chrome extension is loaded, there is a warning: `'background.scripts' requires manifest version of 2 or lower.`.
+  - This is expected since Chrome uses manifest v3 style where Firefox is still v2 style manifest-based.
+  - This is just a warning and does not break any functionality for the extension in Chrome.
 
 ---
 
