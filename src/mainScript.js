@@ -1,9 +1,7 @@
-
 function mainScript() {
   (function () {
     let current = 0;
     let localStorageKey = 'gh-single-file-toggle-enabled';
-    let enabled = localStorage.getItem(localStorageKey) === 'true';
     // ✅ top-level for SPA detection
     let lastUrl = location.href;
 
@@ -43,7 +41,7 @@ function mainScript() {
     }
 
     function applyFromHash() {
-      if (!enabled) return;
+      if (!isEnabled()) return;
       const idx = findIndexFromHash();
       if (idx !== -1) { showFile(idx); } else { showFile(current); }
     }
@@ -109,7 +107,7 @@ function mainScript() {
       btn.appendChild(knob);
 
       function render() {
-        if (enabled) {
+        if (isEnabled()) {
           btn.style.background = '#2da44e';
           knob.style.left = '17px';
         } else {
@@ -118,13 +116,16 @@ function mainScript() {
         }
       }
 
+      // btn.disabled = getFiles().length === 1; // disable toggle if only one file
+      console.log('Toggle button enabled:', !btn.disabled);
       btn.onclick = function () {
-        enabled = !enabled;
-        localStorage.setItem(localStorageKey, enabled);
+        let newButtonState = !isEnabled();
+        localStorage.setItem(localStorageKey, newButtonState);
         render();
         syncView();
       };
 
+      // Ensure the toggle reflects the correct state on initialization
       render();
       wrapper.appendChild(label);
       wrapper.appendChild(btn);
