@@ -1,8 +1,10 @@
-// Directly navigate to the PR page (refresh or open in new tab)
+function isGitHubDiffUrl(url) {
+  return url.includes('/pull/') || url.includes('/commit/');
+}
+
+// Directly navigate to the PR/commit page (refresh or open in new tab)
 chrome.webNavigation.onCompleted.addListener((details) => {
-  if (!details.url.includes('/pull/')) {
-    return;
-  }
+  if (!isGitHubDiffUrl(details.url)) return;
 
   chrome.scripting.executeScript({
     target: { tabId: details.tabId },
@@ -12,7 +14,7 @@ chrome.webNavigation.onCompleted.addListener((details) => {
 
 // SPA navigation (clicking around GitHub)
 chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
-  if (!details.url.includes('/pull/')) return;
+  if (!isGitHubDiffUrl(details.url)) return;
 
   chrome.scripting.executeScript({
     target: { tabId: details.tabId },

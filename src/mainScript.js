@@ -5,7 +5,28 @@ function mainScript() {
     // ✅ top-level for SPA detection
     let lastUrl = location.href;
 
-    function getFiles() { return Array.from(document.querySelectorAll('div[class*="diffEntry"]')); }
+    function getFiles() {
+      // PR pages
+      const prFiles = Array.from(document.querySelectorAll('div[class*="diffEntry"]'));
+      if (prFiles.length) return prFiles;
+
+      // Commit pages: each file diff is a div[role="region"] wrapping a Diff-module header
+      const diffHeaders = document.querySelectorAll('div[class*="Diff-module__diffHeaderWrapper"]');
+      if (diffHeaders.length) {
+        const seen = new Set();
+        const regions = [];
+        diffHeaders.forEach(h => {
+          const region = h.closest('[role="region"]');
+          if (region && !seen.has(region)) {
+            seen.add(region);
+            regions.push(region);
+          }
+        });
+        if (regions.length) return regions;
+      }
+
+      return [];
+    }
 
     function showAll() { getFiles().forEach(f => f.style.display = 'block'); }
 
@@ -34,10 +55,14 @@ function mainScript() {
     function findIndexFromHash() {
       const hash = window.location.hash;
       if (!hash) return -1;
-      const el = document.querySelector(hash);
-      if (!el) return -1;
+      const anchor = hash.slice(1);
       const files = getFiles();
-      return files.findIndex(f => f.contains(el));
+      // Ask each file whether it owns this anchor — works for both
+      // PR pages (outer div has id) and commit pages (inner table has data-diff-anchor)
+      return files.findIndex(f =>
+        f.id === anchor ||
+        !!f.querySelector('[data-diff-anchor="' + anchor + '"]')
+      );
     }
 
     function applyFromHash() {
@@ -54,10 +79,53 @@ function mainScript() {
           window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
 
+    function isGitHubDiffPage() {
+      return location.href.includes('/pull/') || location.href.includes('/commit/');
+    }
+
+    // Returns the container to append/insert the toggle into.
+    // PR pages: the existing tablist (sticky by GitHub's own CSS).
+    // Commit pages: the "X files changed" stats bar, made sticky.
+    // Fallback: a sticky toolbar injected before the first diff entry.
+    function getOrCreateToggleContainer() {
+      // PR pages
+      const tablist = document.querySelector('div[role="tablist"]');
+      if (tablist) return tablist;
+
+      // Commit pages — "X files changed" stats bar
+      const statsBar = document.querySelector('div[class*="CommitHeader-module__commitFilesChangedContainer"]');
+      if (statsBar) {
+        // Pin it once so the toggle stays accessible while scrolling through diffs
+        if (!statsBar.dataset.ghStickyApplied) {
+          statsBar.style.position = 'sticky';
+          statsBar.style.top = '0';
+          statsBar.style.zIndex = '100';
+          statsBar.style.backgroundColor = 'var(--bgColor-default, #ffffff)';
+          statsBar.style.padding = '8px 0';
+          statsBar.dataset.ghStickyApplied = 'true';
+        }
+        return statsBar;
+      }
+
+      // Fallback: sticky toolbar injected before the first diff entry
+      const existing = document.getElementById('gh-single-file-toolbar');
+      if (existing) return existing;
+
+      const firstDiff = document.querySelector('div[class*="diffEntry"]');
+      if (!firstDiff || !firstDiff.parentElement) return null;
+
+      const toolbar = document.createElement('div');
+      toolbar.id = 'gh-single-file-toolbar';
+      toolbar.style.cssText = 'display:flex;align-items:center;padding:8px 4px;margin-bottom:8px;position:sticky;top:0;z-index:100;background-color:var(--bgColor-default,#ffffff);';
+      firstDiff.parentElement.insertBefore(toolbar, firstDiff);
+      return toolbar;
+    }
+
     function pollToggle() {
       setInterval(() => {
-        const container = document.querySelector('div[role="tablist"]');
-        if (!container) return;              // tab bar not ready yet
+        if (!isGitHubDiffPage()) return;
+        const container = getOrCreateToggleContainer();
+        if (!container) return;              // container not ready yet
         if (!document.getElementById('gh-single-file-toggle')) {
           addToggle();                        // safe because addToggle() is idempotent
         }
@@ -76,7 +144,7 @@ function mainScript() {
     function addToggle() {
       // safety check to prevent multiple toggles in case of multiple triggers
       if (document.getElementById('gh-single-file-toggle')) return;
-      const container = document.querySelector('div[role="tablist"]');
+      const container = getOrCreateToggleContainer();
       if (!container) return setTimeout(addToggle, 500);
 
       const isDark = isDarkMode();
@@ -167,10 +235,14 @@ function mainScript() {
 
     function checkUrlChange() {
       if (location.href !== lastUrl) {
+        const oldPath = lastUrl.split('#')[0];
+        const newPath = location.href.split('#')[0];
         lastUrl = location.href;
-        if (location.href.includes('/pull/')) {
-          addToggle(); // PR page detected → re-apply toggle and single file view if enabled
-          waitForFilesAndInit(); // ✅ ensures files are ready before applying single-file view
+        // Only re-init on actual page navigation, not hash-only changes.
+        // Hash-only changes (sidebar file clicks) are handled by the hashchange listener.
+        if (isGitHubDiffPage() && oldPath !== newPath) {
+          addToggle();
+          waitForFilesAndInit();
         }
       }
       requestAnimationFrame(checkUrlChange);
