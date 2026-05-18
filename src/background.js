@@ -1,23 +1,25 @@
-function isGitHubDiffUrl(url) {
-  return url.includes('/pull/') || url.includes('/commit/');
+function getScriptsForUrl(url) {
+  if (url.includes("/pull/")) return ["src/common.js", "src/prScript.js"];
+  if (url.includes("/commit/")) return ["src/common.js", "src/commitScript.js"];
+  return null;
 }
 
-// Directly navigate to the PR/commit page (refresh or open in new tab)
+// Direct navigation (hard refresh or new tab)
 chrome.webNavigation.onCompleted.addListener((details) => {
-  if (!isGitHubDiffUrl(details.url)) return;
-
+  const scripts = getScriptsForUrl(details.url);
+  if (!scripts) return;
   chrome.scripting.executeScript({
     target: { tabId: details.tabId },
-    files: ['src/mainScript.js']
+    files: scripts,
   });
 });
 
 // SPA navigation (clicking around GitHub)
-chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
-  if (!isGitHubDiffUrl(details.url)) return;
-
+chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
+  const scripts = getScriptsForUrl(details.url);
+  if (!scripts) return;
   chrome.scripting.executeScript({
     target: { tabId: details.tabId },
-    files: ['src/mainScript.js']
+    files: scripts,
   });
 });
